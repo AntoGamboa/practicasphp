@@ -35,17 +35,50 @@
         }
         public function Read($codefind)
         {
-            $query = "select * from autor where cod_autor = '$codefind'";
-            $request = mysqli_query($this->instConnection, $query);
-            if($requestreturned = mysqli_fetch_array($request, MYSQLI_ASSOC))
+            $query = "select * from autor where cod_autor = ?";
+            $requesprepare=mysqli_prepare($this->instConnection,$query);
+            $requestvinc=mysqli_stmt_bind_param($requesprepare,"s",$codefind);
+            $requestvinc=mysqli_stmt_execute($requesprepare);
+            
+            if($requestvinc==false)
             {
-                return $requestreturned;
+
+                echo "<script>alert('ocurrio un error en la consulta');</script>";
+
+            }
+            else
+            {
+
+               $requestvinc=mysqli_stmt_bind_result($requesprepare,$cod_autor,$nombre,$nacion);
+               mysqli_stmt_fetch($requesprepare);
+               
+               $arrayreturned=array
+               ("cod_autor"=>$cod_autor,
+               "nombre"=>$nombre,
+               "nacion"=>$nacion);
+               
+               mysqli_stmt_close($requesprepare);
+               
+               return $arrayreturned;
+
+
+
+            }
+
+
+
+            
+            /*
+            $request = mysqli_query($this->instConnection, $query);
+            if($requestvinc = mysqli_fetch_array($request, MYSQLI_ASSOC))
+            {
+                return $requestvinc;
             }
             else
             {
                 echo "<script>alert('registro inexistente')</script>";
 
-            }
+            }*/
            
         }
         public function update(autor $update)
